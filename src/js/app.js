@@ -30,12 +30,6 @@ var ViewModel = function() {
 		// makeMarkers(results);
 		for(var i = 0; i < results.length; i++) {
 			results[i].show = ko.observable(true);
-			// var marker = new google.maps.Marker({
-			// 	position: results[i].geometry.location,
-			// 	map: map
-			// });
-			// // Push the marker into the markers array
-			// markers.push(marker);
 			self.placeList.push(results[i]);
 		}
 
@@ -63,6 +57,7 @@ var ViewModel = function() {
 	this.showInfoWindow = function(index) {
 		var marker = markers[index()];
 		// populateInfoWindow(marker, largeInfowindow);
+		console.log(index());
 		triggerClick(marker);
 	};
 
@@ -119,13 +114,18 @@ function runNearbySearch() {
 function makeMarkers(results) {
 	// clearing the markers array
 	hideMarkers();
+	var markerMap;
 	markers.length = 0;
 	for(var i = 0; i < results.length; i++) {
 		if(results[i].show() === true) {
-				console.log(i);
+			markerMap = map;
+		}
+		else {
+			markerMap = null;
+		}
 				var marker = new google.maps.Marker({
 				position: results[i].geometry.location,
-				map: map,
+				map: markerMap,
 				title: results[i].name,
 				icon: defaultIcon
 			});
@@ -145,7 +145,6 @@ function makeMarkers(results) {
 			marker.addListener('mouseout', function() {
 				this.setIcon(defaultIcon);
 			});
-		}
 	}
 }
 
