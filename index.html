@@ -1,1 +1,30 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Neighborhood Map</title><link rel="stylesheet" href="dist/css/main.min.css"></head><body><header class="header"><span class="arrow">&#8592;</span></header><div class="searchAndList"></div><div class="map"></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script><script src="dist/js/app.min.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Neighborhood Map</title>
+	<link rel="stylesheet" href="dist/css/main.min.css">
+</head>
+<body>
+	<header class="header">
+		<span class="arrow">&#8592;</span>
+	</header>
+	<div class="searchAndList">
+
+	</div>
+
+	<div class="map" id="map">
+
+	</div>
+
+	<!-- Custom JavaScript -->
+	<script src="dist/js/app.min.js"></script>
+
+	<!-- Config file to import API keys -->
+	<script src="dist/js/config.min.js"></script>
+
+	<!-- Google maps api -->
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=" + apiKeys.googleMaps + "&callback=initMap&onerror=mapError()"></script>
+</body>
+</html>
