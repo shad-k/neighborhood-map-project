@@ -16,6 +16,12 @@ body {
 }
 
 
+.main {
+	height: 100%;
+	width: 100%;
+}
+
+
 .searchAndList {
 	height: 100%;
 	width: 100%;
@@ -64,4 +70,34 @@ body {
 	top: 30px;
 	height: 10%;
 	font-size: 2em;
+}
+
+
+.placeList {
+	position: relative;
+	top: 30px;
+}
+
+
+@media screen and (min-width: 1000px) {
+	.searchAndList {
+		width: 20%;
+		left: 0%;
+		position: static;
+	}
+
+
+	.map {
+		width: 80%;
+	}
+
+
+	.main {
+		display: flex;
+	}
+
+
+	.header {
+		display: none;
+	}
 }
