@@ -15,7 +15,7 @@
 		<input type="text" placeholder="Enter a string" class="inputField" data-bind="value: filterText, event: {'keyup' : filter}">
 
 		<ul class="placeList" data-bind="foreach: placeList">
-			<li data-bind="visible: show, text: show"></li>
+			<li data-bind="visible: show, text: name, click: $parent.showInfoWindow($index)"></li>
 		</ul>
 	</div>
 

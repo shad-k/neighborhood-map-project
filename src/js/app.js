@@ -7,6 +7,9 @@ document.querySelector(".arrow").addEventListener("click", function(event) {
 var markers = [];
 var map;
 var pos;
+var defaultIcon;
+var highlightedIcon;
+var largeInfowindow;
 
 var ViewModel = function() {
 	// Places Service
@@ -70,6 +73,17 @@ function initMap() {
 		mapTypeControl: false // Disabling the map type controls since it is not needed currently
 	});
 
+	// Code borrowed from Google Maps API course on Udacity
+	// Style the markers a bit. This will be our listing marker icon.
+    defaultIcon = makeMarkerIcon('0091ff');
+
+    // Create a "highlighted location" marker color for when the user
+    // mouses over the marker.
+	highlightedIcon = makeMarkerIcon('FFFF24');
+
+    largeInfowindow = new google.maps.InfoWindow();
+    // Udacity code ends
+
 	// This line registers a listener for whenever the map becomes idle after being moved.
 	// This runs the places api's nearby search afresh.
 	// map.addListener("idle", runNearbySearch);
@@ -105,13 +119,60 @@ function makeMarkers(results) {
 				console.log(i);
 				var marker = new google.maps.Marker({
 				position: results[i].geometry.location,
-				map: map
+				map: map,
+				title: results[i].name,
+				icon: defaultIcon
 			});
 			// Push the marker into the markers array
 			markers.push(marker);
+
+			// Create an onclick event to open the large infowindow at each marker.
+			marker.addListener('click', function() {
+				populateInfoWindow(this, largeInfowindow);
+			});
+			// Two event listeners - one for mouseover, one for mouseout,
+			// to change the colors back and forth.
+			marker.addListener('mouseover', function() {
+				this.setIcon(highlightedIcon);
+			});
+			marker.addListener('mouseout', function() {
+				this.setIcon(defaultIcon);
+			});
 		}
 	}
 }
+
+// Code borrowed from Udacity's course on Google Maps API
+function makeMarkerIcon(markerColor) {
+	var markerImage = new google.maps.MarkerImage(
+	'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+	'|40|_|%E2%80%A2',
+	new google.maps.Size(21, 34),
+	new google.maps.Point(0, 0),
+	new google.maps.Point(10, 34),
+	new google.maps.Size(21,34));
+	return markerImage;
+}
+
+
+// This function populates the infowindow when the marker is clicked. We'll only allow
+// one infowindow which will open at the marker that is clicked, and populate based
+// on that markers position.
+function populateInfoWindow(marker, infowindow) {
+	// Check to make sure the infowindow is not already opened on this marker.
+	if (infowindow.marker != marker) {
+	  infowindow.marker = marker;
+	  infowindow.setContent('<div>' + marker.title + '</div>');
+	  infowindow.open(map, marker);
+	  // Make sure the marker property is cleared if the infowindow is closed.
+	  infowindow.addListener('closeclick', function() {
+		infowindow.marker = null;
+	  });
+	}
+}
+// Code Ends
+
+
 
 function hideMarkers() {
 	for(var i = 0; i < markers.length; i++) {
