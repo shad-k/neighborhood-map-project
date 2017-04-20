@@ -56,3 +56,12 @@ body {
 	float: right;
 	transition: 0.5s;
 }
+
+
+.inputField {
+	width: 100%;
+	position: relative;
+	top: 30px;
+	height: 10%;
+	font-size: 2em;
+}
