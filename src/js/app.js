@@ -60,6 +60,12 @@ var ViewModel = function() {
 		}
 	}
 
+	this.showInfoWindow = function(index) {
+		var marker = markers[index()];
+		// populateInfoWindow(marker, largeInfowindow);
+		triggerClick(marker);
+	};
+
 };
 
 // Callback function that runs when the Google Maps API has loaded successfully
@@ -129,6 +135,7 @@ function makeMarkers(results) {
 			// Create an onclick event to open the large infowindow at each marker.
 			marker.addListener('click', function() {
 				populateInfoWindow(this, largeInfowindow);
+				this.setAnimation(google.maps.Animation.BOUNCE);
 			});
 			// Two event listeners - one for mouseover, one for mouseout,
 			// to change the colors back and forth.
@@ -167,6 +174,7 @@ function populateInfoWindow(marker, infowindow) {
 	  // Make sure the marker property is cleared if the infowindow is closed.
 	  infowindow.addListener('closeclick', function() {
 		infowindow.marker = null;
+		marker.setAnimation(null);
 	  });
 	}
 }
@@ -182,4 +190,10 @@ function hideMarkers() {
 
 function mapError() {
 	alert("The site is not available right now. Please try after some time");
+}
+
+function triggerClick(marker) {
+	if(marker) {
+		google.maps.event.trigger(marker, 'click');
+	}
 }
