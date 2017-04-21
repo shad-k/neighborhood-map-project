@@ -57,7 +57,7 @@ var ViewModel = function() {
 			// Update markers on the map
 			makeMarkers(self.placeList());
 		}
-	}
+	};
 
 	// This function calls the click trigger function whenever a list item is clicked
 	this.showInfoWindow = function(index) {
@@ -92,21 +92,6 @@ function initMap() {
 
 	// Bind the ViewModel
 	ko.applyBindings(new ViewModel());
-}
-
-
-function runNearbySearch() {
-	// Places Service
-	var places = new google.maps.places.PlacesService(map);
-
-	// Run the nearby search on the current bounds of the map
-	places.nearbySearch({
-		location: pos,
-		radius: "4000",
-		rankBy: google.maps.places.RankBy.PROMINENCE
-	}, function(results, status) {
-		makeMarkers(results);
-	});
 }
 
 // This function is called by the nearby search callback function.
@@ -188,6 +173,7 @@ function populateInfoWindow(marker, infowindow) {
 			url: "https://developers.zomato.com/api/v2.1/locations?apikey=7fdd26d8333950e56b339a2038e799c1&query="
 			+ marker.title + "&lat=" + marker.position.lat() + "&lon=" + marker.position.lng(),
 			success: function(response) {
+				var info;
 				$.ajax({
 					// Get the average cost of two for the particular restaurant
 					url: "https://developers.zomato.com/api/v2.1/location_details?apikey=7fdd26d8333950e56b339a2038e799c1" +
@@ -195,13 +181,13 @@ function populateInfoWindow(marker, infowindow) {
 					success: function(response) {
 						// If the cost for two details exist show that
 						if(response.best_rated_restaurant[0]) {
-							var info = "<p>" + marker.title + "</p><p>Average Cost of Two = " +
+							info = "<p>" + marker.title + "</p><p>Average Cost of Two = " +
 							response.best_rated_restaurant[0].restaurant.average_cost_for_two + "</p>";
 						}
 						// Else show the nightlife index of the place
 						else {
 							// console.log(response);
-							var info = "<p>" + marker.title + "</p><p>Nightlife Index = " +
+							info = "<p>" + marker.title + "</p><p>Nightlife Index = " +
 							response.nightlife_index + "</p>";
 						}
 						infowindow.marker = marker;
@@ -217,7 +203,7 @@ function populateInfoWindow(marker, infowindow) {
 						alert("There is a problem with the Zomato API. Please try again after some time");
 					},
 					crossDomain: true
-				})
+				});
 			},
 			error: function(error) {
 				alert("There is a problem with the Zomato API. Please try again after some time");
