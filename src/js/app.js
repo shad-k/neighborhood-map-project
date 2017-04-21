@@ -55,7 +55,7 @@ var ViewModel = function() {
 			}
 
 			// Update markers on the map
-			makeMarkers(self.placeList());
+			updateMarkers(self.placeList());
 		}
 	};
 
@@ -97,39 +97,29 @@ function initMap() {
 // This function is called by the nearby search callback function.
 // It puts markers on the map for each of the location being returned.
 function makeMarkers(results) {
-	// clearing the markers array
-	hideMarkers();
-	var markerMap;
-	markers.length = 0;
 	for(var i = 0; i < results.length; i++) {
-		if(results[i].show() === true) {
-			markerMap = map;
-		}
-		else {
-			markerMap = null;
-		}
-				var marker = new google.maps.Marker({
-				position: results[i].geometry.location,
-				map: markerMap,
-				title: results[i].name,
-				icon: defaultIcon
-			});
-			// Push the marker into the markers array
-			markers.push(marker);
+		var marker = new google.maps.Marker({
+			position: results[i].geometry.location,
+			map: map,
+			title: results[i].name,
+			icon: defaultIcon
+		});
+		// Push the marker into the markers array
+		markers.push(marker);
 
-			// Create an onclick event to open the large infowindow at each marker.
-			marker.addListener('click', function() {
-				populateInfoWindow(this, largeInfowindow);
-				this.setAnimation(google.maps.Animation.BOUNCE);
-			});
-			// Two event listeners - one for mouseover, one for mouseout,
-			// to change the colors back and forth.
-			marker.addListener('mouseover', function() {
-				this.setIcon(highlightedIcon);
-			});
-			marker.addListener('mouseout', function() {
-				this.setIcon(defaultIcon);
-			});
+		// Create an onclick event to open the large infowindow at each marker.
+		marker.addListener('click', function() {
+			populateInfoWindow(this, largeInfowindow);
+			this.setAnimation(google.maps.Animation.BOUNCE);
+		});
+		// Two event listeners - one for mouseover, one for mouseout,
+		// to change the colors back and forth.
+		marker.addListener('mouseover', function() {
+			this.setIcon(highlightedIcon);
+		});
+		marker.addListener('mouseout', function() {
+			this.setIcon(defaultIcon);
+		});
 	}
 
 	// Fit the map bounds to show all the markers
@@ -138,14 +128,16 @@ function makeMarkers(results) {
 
 
 // This function will loop through the markers array and display them all.
-      function fitBounds() {
-        var bounds = new google.maps.LatLngBounds();
-        // Extend the boundaries of the map for each marker and display the marker
-        for (var i = 0; i < markers.length; i++) {
-          bounds.extend(markers[i].position);
-        }
-        map.fitBounds(bounds);
-      }
+function fitBounds() {
+	var bounds = new google.maps.LatLngBounds();
+	// Extend the boundaries of the map for each marker and display the marker
+	for (var i = 0; i < markers.length; i++) {
+		if(markers[i].getVisible() === true) {
+			bounds.extend(markers[i].position);
+		}
+	}
+	map.fitBounds(bounds);
+}
 
 // Code borrowed from Udacity's course on Google Maps API
 function makeMarkerIcon(markerColor) {
@@ -186,7 +178,6 @@ function populateInfoWindow(marker, infowindow) {
 						}
 						// Else show the nightlife index of the place
 						else {
-							// console.log(response);
 							info = "<p>" + marker.title + "</p><p>Nightlife Index = " +
 							response.nightlife_index + "</p>";
 						}
@@ -214,11 +205,24 @@ function populateInfoWindow(marker, infowindow) {
 	}
 }
 
+// Shows/hides markers when filter is applied
+function updateMarkers(placeList) {
+	hideMarkers();
+	for(var i = 0; i < placeList.length; i++) {
+		if(placeList[i].show() === true) {
+			markers[i].setVisible(true);
+		}
+	}
+
+	// Fit the map bounds to show all the markers
+	fitBounds();
+}
+
 
 // Hides all the markers in the markers array.
 function hideMarkers() {
 	for(var i = 0; i < markers.length; i++) {
-		markers[i].setMap(null);
+		markers[i].setVisible(false);
 	}
 }
 
