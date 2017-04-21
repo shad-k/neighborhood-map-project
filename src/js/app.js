@@ -25,7 +25,7 @@ var ViewModel = function() {
 	places.nearbySearch({
 		location: pos,
 		radius: "4000",
-		rankBy: google.maps.places.RankBy.PROMINENCE
+		type: "restaurant"
 	}, function(results, status) {
 		// makeMarkers(results);
 		for(var i = 0; i < results.length; i++) {
@@ -65,9 +65,9 @@ var ViewModel = function() {
 
 // Callback function that runs when the Google Maps API has loaded successfully
 function initMap() {
+	// The coordinates below belong to Connaught Place, New Delhi
+	pos = new google.maps.LatLng(28.6375771, 77.22336);
 
-	pos = new google.maps.LatLng(28.5714851, 77.2591487);
-	// The coordinates below belong to New Delhi
 	map = new google.maps.Map(document.getElementById("map"), {
 		zoom: 15,
 		center: pos,
@@ -146,7 +146,19 @@ function makeMarkers(results) {
 				this.setIcon(defaultIcon);
 			});
 	}
+	fitBounds();
 }
+
+
+// This function will loop through the markers array and display them all.
+      function fitBounds() {
+        var bounds = new google.maps.LatLngBounds();
+        // Extend the boundaries of the map for each marker and display the marker
+        for (var i = 0; i < markers.length; i++) {
+          bounds.extend(markers[i].position);
+        }
+        map.fitBounds(bounds);
+      }
 
 // Code borrowed from Udacity's course on Google Maps API
 function makeMarkerIcon(markerColor) {
@@ -167,14 +179,39 @@ function makeMarkerIcon(markerColor) {
 function populateInfoWindow(marker, infowindow) {
 	// Check to make sure the infowindow is not already opened on this marker.
 	if (infowindow.marker != marker) {
-	  infowindow.marker = marker;
-	  infowindow.setContent('<div>' + marker.title + '</div>');
-	  infowindow.open(map, marker);
-	  // Make sure the marker property is cleared if the infowindow is closed.
-	  infowindow.addListener('closeclick', function() {
-		infowindow.marker = null;
-		marker.setAnimation(null);
-	  });
+		$.ajax({
+			url: "https://developers.zomato.com/api/v2.1/locations?apikey=7fdd26d8333950e56b339a2038e799c1&query="
+			+ marker.title + "&lat=" + marker.position.lat() + "&lon=" + marker.position.lng(),
+			success: function(response) {
+				$.ajax({
+					url: "https://developers.zomato.com/api/v2.1/location_details?apikey=7fdd26d8333950e56b339a2038e799c1" +
+					"&entity_id=" + response.location_suggestions[0].entity_id + "&entity_type=" + response.location_suggestions[0].entity_type,
+					success: function(response) {
+
+						// console.log(response.best_rated_restaurant[0].restaurant.average_cost_for_two);
+						var info = "<p>" + marker.title + "</p><p>Average Cost of Two = " +
+							response.best_rated_restaurant[0].restaurant.average_cost_for_two + "</p>";
+							infowindow.marker = marker;
+							  infowindow.setContent('<div>' + info + '</div>');
+							  infowindow.open(map, marker);
+							  // Make sure the marker property is cleared if the infowindow is closed.
+							  infowindow.addListener('closeclick', function() {
+								infowindow.marker = null;
+								marker.setAnimation(null);
+							  });
+					},
+					error: function() {
+						alert("There is a problem with the Zomato API. Please try again after some time");
+					},
+					crossDomain: true
+				})
+			},
+			error: function(error) {
+				alert("There is a problem with the Zomato API. Please try again after some time");
+			},
+			crossDomain: true
+		});
+
 	}
 }
 // Code Ends
