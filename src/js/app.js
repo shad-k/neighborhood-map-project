@@ -1,9 +1,3 @@
-// Open the side bar when the arrow is clicked --- only for mobile displays
-document.querySelector(".arrow").addEventListener("click", function(event) {
-	document.querySelector(".searchAndList").classList.toggle("slipIn");
-	document.querySelector(".arrow").classList.toggle("floatRight");
-});
-
 var markers = [];
 var map;
 var pos;
@@ -82,6 +76,12 @@ var ViewModel = function() {
 		// populateInfoWindow(marker, largeInfowindow);
 		triggerClick(marker);
 	};
+
+	this.searchIsVisible = ko.observable(false);
+
+	this.toggleSearch = function() {
+		self.searchIsVisible(!self.searchIsVisible());
+	}
 
 };
 
