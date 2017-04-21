@@ -185,7 +185,6 @@ function makeMarkerIcon(markerColor) {
 function populateInfoWindow(marker, infowindow) {
 	// Check to make sure the infowindow is not already opened on this marker.
 	if (infowindow.marker != marker) {
-
 		// Get the details from the Zomato API
 		$.ajax({
 			// Get the entity_id and entity_type
@@ -193,10 +192,12 @@ function populateInfoWindow(marker, infowindow) {
 			+ marker.title + "&lat=" + marker.position.lat() + "&lon=" + marker.position.lng(),
 			success: function(response) {
 				var info;
+				response.location_suggestions[0] ? entity_id = response.location_suggestions[0].entity_id : entity_id =null;
+				response.location_suggestions[0] ? entity_type = response.location_suggestions[0].entity_type : entity_type = null;
 				$.ajax({
 					// Get the average cost of two for the particular restaurant
 					url: "https://developers.zomato.com/api/v2.1/location_details?apikey=7fdd26d8333950e56b339a2038e799c1" +
-					"&entity_id=" + response.location_suggestions[0].entity_id + "&entity_type=" + response.location_suggestions[0].entity_type,
+					"&entity_id=" + entity_id + "&entity_type=" + entity_type,
 					success: function(response) {
 						// If the cost for two details exist show that
 						if(response.best_rated_restaurant[0]) {
