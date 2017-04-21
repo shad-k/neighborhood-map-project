@@ -110,6 +110,7 @@ function makeMarkers(results) {
 		// Create an onclick event to open the large infowindow at each marker.
 		marker.addListener('click', function() {
 			populateInfoWindow(this, largeInfowindow);
+			stopMarkerAnimation();
 			this.setAnimation(google.maps.Animation.BOUNCE);
 		});
 		// Two event listeners - one for mouseover, one for mouseout,
@@ -124,6 +125,15 @@ function makeMarkers(results) {
 
 	// Fit the map bounds to show all the markers
 	fitBounds();
+}
+
+// Stop the current marker animation
+function stopMarkerAnimation() {
+	for(var i = 0; i < markers.length; i++) {
+		if(markers[i].getAnimation) {
+			markers[i].setAnimation(null);
+		}
+	}
 }
 
 
