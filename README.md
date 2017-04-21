@@ -20,3 +20,5 @@ It is responsible for:
 #### Note
 The source files are present in src directory. The production code is present in dist directory.
 The production index.html file is in the main project directory.
+
+The live version is available [here](https://shad-k.github.io/neighborhood-map-project/index.html).
