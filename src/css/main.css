@@ -29,6 +29,7 @@ body {
 	background-color: red;
 	z-index: 1;
 	left: -100%;
+	overflow: auto;
 }
 
 
@@ -76,6 +77,17 @@ body {
 .placeList {
 	position: relative;
 	top: 30px;
+	padding: 0;
+}
+
+
+.list-item {
+	list-style: none;
+	padding: 5px 10px;
+	background-color: #000;
+	color: #FFF;
+	font-size: 1.5em;
+	margin-top: 2px;
 }
 
 
