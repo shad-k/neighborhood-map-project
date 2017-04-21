@@ -1,4 +1,4 @@
-// Open the side bar when the arrow is clicked
+// Open the side bar when the arrow is clicked --- only for mobile displays
 document.querySelector(".arrow").addEventListener("click", function(event) {
 	document.querySelector(".searchAndList").classList.toggle("slipIn");
 	document.querySelector(".arrow").classList.toggle("floatRight");
@@ -15,10 +15,9 @@ var ViewModel = function() {
 	// Places Service
 	var places = new google.maps.places.PlacesService(map);
 
-	this.filter = ko.observable();
-
 	var self = this;
 
+	// The array of places that appear on the map
 	this.placeList = ko.observableArray([]);
 
 	// Run the nearby search on the current bounds of the map
@@ -33,31 +32,37 @@ var ViewModel = function() {
 			self.placeList.push(results[i]);
 		}
 
+		// Put markers on the map
 		makeMarkers(self.placeList());
 	});
 
+	// Contains the text from the search input field
 	this.filterText = ko.observable();
 
+	// This function filters the placeList whenever the enter key is pressed inside the search field
 	this.filter = function(data, event) {
 		if(event.keyCode === 13) {
 			for(var i = 0; i < self.placeList().length ; i++)
 			{
 				if(self.placeList()[i].name.includes(self.filterText())) {
+					// If the marker contains the search text then show it
 					self.placeList()[i].show(true);
-					console.log(self.placeList()[i].show());
 				}
 				else {
+					// Else hide it
 					self.placeList()[i].show(false);
 				}
 			}
+
+			// Update markers on the map
 			makeMarkers(self.placeList());
 		}
 	}
 
+	// This function calls the click trigger function whenever a list item is clicked
 	this.showInfoWindow = function(index) {
 		var marker = markers[index()];
 		// populateInfoWindow(marker, largeInfowindow);
-		console.log(index());
 		triggerClick(marker);
 	};
 
@@ -85,12 +90,7 @@ function initMap() {
     largeInfowindow = new google.maps.InfoWindow();
     // Udacity code ends
 
-	// This line registers a listener for whenever the map becomes idle after being moved.
-	// This runs the places api's nearby search afresh.
-	// map.addListener("idle", runNearbySearch);
-
-	// runNearbySearch();
-
+	// Bind the ViewModel
 	ko.applyBindings(new ViewModel());
 }
 
@@ -146,6 +146,8 @@ function makeMarkers(results) {
 				this.setIcon(defaultIcon);
 			});
 	}
+
+	// Fit the map bounds to show all the markers
 	fitBounds();
 }
 
@@ -179,26 +181,37 @@ function makeMarkerIcon(markerColor) {
 function populateInfoWindow(marker, infowindow) {
 	// Check to make sure the infowindow is not already opened on this marker.
 	if (infowindow.marker != marker) {
+
+		// Get the details from the Zomato API
 		$.ajax({
+			// Get the entity_id and entity_type
 			url: "https://developers.zomato.com/api/v2.1/locations?apikey=7fdd26d8333950e56b339a2038e799c1&query="
 			+ marker.title + "&lat=" + marker.position.lat() + "&lon=" + marker.position.lng(),
 			success: function(response) {
 				$.ajax({
+					// Get the average cost of two for the particular restaurant
 					url: "https://developers.zomato.com/api/v2.1/location_details?apikey=7fdd26d8333950e56b339a2038e799c1" +
 					"&entity_id=" + response.location_suggestions[0].entity_id + "&entity_type=" + response.location_suggestions[0].entity_type,
 					success: function(response) {
-
-						// console.log(response.best_rated_restaurant[0].restaurant.average_cost_for_two);
-						var info = "<p>" + marker.title + "</p><p>Average Cost of Two = " +
+						// If the cost for two details exist show that
+						if(response.best_rated_restaurant[0]) {
+							var info = "<p>" + marker.title + "</p><p>Average Cost of Two = " +
 							response.best_rated_restaurant[0].restaurant.average_cost_for_two + "</p>";
-							infowindow.marker = marker;
-							  infowindow.setContent('<div>' + info + '</div>');
-							  infowindow.open(map, marker);
-							  // Make sure the marker property is cleared if the infowindow is closed.
-							  infowindow.addListener('closeclick', function() {
-								infowindow.marker = null;
-								marker.setAnimation(null);
-							  });
+						}
+						// Else show the nightlife index of the place
+						else {
+							// console.log(response);
+							var info = "<p>" + marker.title + "</p><p>Nightlife Index = " +
+							response.nightlife_index + "</p>";
+						}
+						infowindow.marker = marker;
+						infowindow.setContent('<div>' + info + '</div>');
+						infowindow.open(map, marker);
+						// Make sure the marker property is cleared if the infowindow is closed.
+						infowindow.addListener('closeclick', function() {
+							infowindow.marker = null;
+							marker.setAnimation(null);
+						});
 					},
 					error: function() {
 						alert("There is a problem with the Zomato API. Please try again after some time");
@@ -214,20 +227,21 @@ function populateInfoWindow(marker, infowindow) {
 
 	}
 }
-// Code Ends
 
 
-
+// Hides all the markers in the markers array.
 function hideMarkers() {
 	for(var i = 0; i < markers.length; i++) {
 		markers[i].setMap(null);
 	}
 }
 
+// Runs when there is a problem with the Google Maps API
 function mapError() {
 	alert("The site is not available right now. Please try after some time");
 }
 
+// Triggers the click event on the marker passed as argument
 function triggerClick(marker) {
 	if(marker) {
 		google.maps.event.trigger(marker, 'click');
