@@ -13,9 +13,9 @@
 	</header>
 	<main class="main">
 		<div class="searchAndList">
-			<input type="text" placeholder="Enter a string" class="inputField" data-bind="value: filterText, event: {'keyup' : filter}">
+			<input type="text" placeholder="Enter a string" class="inputField" data-bind="textInput: filterText" autofocus>
 
-			<ul class="placeList" data-bind="foreach: placeList">
+			<ul class="placeList" data-bind="foreach: filter">
 				<li class="list-item" data-bind="visible: show, text: name, click: $parent.showInfoWindow($index)"></li>
 			</ul>
 		</div>
@@ -35,6 +35,6 @@
 	<script src="dist/js/app.min.js"></script>
 
 	<!-- Google maps api -->
-	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTVZkf8PVcLMACu8V8bpU74BsjR0SImus&callback=initMap&onerror=mapError()&libraries=places"></script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTVZkf8PVcLMACu8V8bpU74BsjR0SImus&callback=initMap&libraries=places" onerror="mapError()"></script>
 </body>
 </html>

@@ -37,27 +37,44 @@ var ViewModel = function() {
 	});
 
 	// Contains the text from the search input field
-	this.filterText = ko.observable();
+	this.filterText = ko.observable('');
 
-	// This function filters the placeList whenever the enter key is pressed inside the search field
-	this.filter = function(data, event) {
-		if(event.keyCode === 13) {
-			for(var i = 0; i < self.placeList().length ; i++)
+	// This function filters the placeList whenever the text is inserted in search field
+	this.filter = ko.computed(function() {
+		// If the search field is empty show all places
+		if(this.filterText() === "") {
+			for(var i = 0; i < this.placeList().length; i++) {
+				this.placeList()[i].show(true);
+			}
+
+			// Update markers on the map
+			// Have to check if markers array has been populated else we get error.
+			// This is because this function gets called before the markers array is populated.
+			if(markers.length > 0) {
+				updateMarkers(this.placeList());
+			}
+
+			return this.placeList();
+		}
+		// else only show places that match the filter
+		else {
+			for(var i = 0; i < this.placeList().length ; i++)
 			{
-				if(self.placeList()[i].name.includes(self.filterText())) {
+				if(this.placeList()[i].name.includes(this.filterText())) {
 					// If the marker contains the search text then show it
-					self.placeList()[i].show(true);
+					this.placeList()[i].show(true);
 				}
 				else {
 					// Else hide it
-					self.placeList()[i].show(false);
+					this.placeList()[i].show(false);
 				}
 			}
 
 			// Update markers on the map
-			updateMarkers(self.placeList());
+			updateMarkers(this.placeList());
+			return this.placeList();
 		}
-	};
+	}, this);
 
 	// This function calls the click trigger function whenever a list item is clicked
 	this.showInfoWindow = function(index) {
